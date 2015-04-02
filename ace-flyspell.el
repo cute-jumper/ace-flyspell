@@ -1,4 +1,4 @@
-;;; ace-flyspell.el --- Jump to and correct spelling errors using ace-jump-mode and flyspell    -*- lexical-binding: t; -*-
+;;; ace-flyspell.el --- Jump to and correct spelling errors using `ace-jump-mode' and flyspell
 
 ;; Copyright (C) 2015  Junpeng Qiu
 
@@ -23,7 +23,7 @@
 
 ;;; Commentary:
 
-;; 
+;;
 
 ;;; Code:
 
@@ -31,7 +31,7 @@
 (require 'flyspell)
 
 (defgroup ace-flyspell nil
-  "Jump to and correct spelling errors using ace-jump-mode and flyspell"
+  "Jump to and correct spelling errors using `ace-jump-mode' and flyspell"
   :group 'flyspell)
 
 (defface ace-flyspell-background
@@ -39,14 +39,14 @@
   "face for ace-flyspell")
 
 (defvar ace-flyspell--ov (let ((ov (make-overlay 1 1 nil nil t)))
-                       (overlay-put ov 'face 'ace-flyspell-background)
-                       ov))
+                           (overlay-put ov 'face 'ace-flyspell-background)
+                           ov))
 
 (defvar ace-flyspell--original-point 1)
 
 (defvar ace-flyspell--original-length 0)
 
-;; Two convinient macros from `ace-link.el', which is a pacakge written by 
+;; Two convinient macros from `ace-link.el', which is a pacakge written by
 ;; Oleh Krehel <ohwoeowho@gmail.com>.
 ;; Original code URL: https://github.com/abo-abo/ace-link
 ;; I modified the macro name to conform the naming convention
@@ -57,31 +57,31 @@
          (old (cl-gensym (symbol-name name))))
     `(let ((,old (symbol-function ',name)))
        (unwind-protect
-            (progn
-              (fset ',name (lambda ,@(cdr binding)))
-              ,@body)
+           (progn
+             (fset ',name (lambda ,@(cdr binding)))
+             ,@body)
          (fset ',name ,old)))))
 
 (defmacro ace-flyspell--generic (candidates &rest follower)
   "Ace jump to CANDIDATES using FOLLOWER."
   (declare (indent 1))
   `(ace-flyspell--flet (ace-jump-search-candidate
-              (str va-list)
-              (mapcar (lambda (x)
-                        (make-aj-position
-                         :offset (1- x)
-                         :visual-area (car va-list)))
-                      ,candidates))
-     (setq ace-jump-mode-end-hook
-           (list (lambda ()
-                   (setq ace-jump-mode-end-hook)
-                   ,@follower)))
-     (let ((ace-jump-mode-scope 'window))
-       (ace-jump-do ""))))
+                        (str va-list)
+                        (mapcar (lambda (x)
+                                  (make-aj-position
+                                   :offset (1- x)
+                                   :visual-area (car va-list)))
+                                ,candidates))
+                       (setq ace-jump-mode-end-hook
+                             (list (lambda ()
+                                     (setq ace-jump-mode-end-hook)
+                                     ,@follower)))
+                       (let ((ace-jump-mode-scope 'window))
+                         (ace-jump-do ""))))
 ;; End macros from `ace-link.el'
 
 (defun ace-flyspell--collect-candidates ()
-  (save-excursion      
+  (save-excursion
     (save-restriction
       (narrow-to-region (window-start) (window-end (selected-window) t))
       (let ((pos (point-min))
@@ -94,7 +94,7 @@
           (when word
             (setq pos (nth 1 word))
             (let* ((ovs (overlays-at pos))
-                   (r (ace-flyspell--has-flyspell-overlay-p ovs)))              
+                   (r (ace-flyspell--has-flyspell-overlay-p ovs)))
               (when r
                 (push pos pos-list)))
             (setq pos (1+ (nth 2 word)))
@@ -132,7 +132,7 @@
         (if (> ov-start ace-flyspell--original-point)
             (goto-char ace-flyspell--original-point)
           (goto-char (+ ace-flyspell--original-point (- (- ov-end ov-start)
-                                                    ace-flyspell--original-length))))
+                                                        ace-flyspell--original-length))))
       (goto-char ace-flyspell--original-point)))
   (delete-overlay ace-flyspell--ov))
 
@@ -141,27 +141,27 @@
   (interactive)
   (setq ace-flyspell--original-point (point))
   (ace-flyspell--generic
-      (ace-flyspell--collect-candidates)
-    (forward-char)
-    (let* ((word-length (length (save-excursion (car (flyspell-get-word))))))
-      (setq ace-flyspell--original-length word-length)
-      (ace-flyspell--add-overlay (point) (+ (point) word-length)))
-    (setq overriding-local-map
-          (let ((map (make-sparse-keymap)))
-            (define-key map (kbd ".") 'ace-flyspell--auto-correct-word)
-            (define-key map [t] 'ace-flyspell--reset)
-            map))
-    (add-hook 'mouse-leave-buffer-hook 'ace-flyspell--reset)
-    (add-hook 'kbd-macro-termination-hook 'ace-flyspell--reset)
-    (add-hook 'minibuffer-setup-hook 'ace-flyspell--reset)
-    (ace-flyspell-help)))
+   (ace-flyspell--collect-candidates)
+   (forward-char)
+   (let* ((word-length (length (save-excursion (car (flyspell-get-word))))))
+     (setq ace-flyspell--original-length word-length)
+     (ace-flyspell--add-overlay (point) (+ (point) word-length)))
+   (setq overriding-local-map
+         (let ((map (make-sparse-keymap)))
+           (define-key map (kbd ".") 'ace-flyspell--auto-correct-word)
+           (define-key map [t] 'ace-flyspell--reset)
+           map))
+   (add-hook 'mouse-leave-buffer-hook 'ace-flyspell--reset)
+   (add-hook 'kbd-macro-termination-hook 'ace-flyspell--reset)
+   (add-hook 'minibuffer-setup-hook 'ace-flyspell--reset)
+   (ace-flyspell-help)))
 
 ;;;###autoload
 (defun ace-flyspell-jump-word ()
   (interactive)
   (ace-flyspell--generic
-      (ace-flyspell--collect-candidates)
-    (forward-char)))
+   (ace-flyspell--collect-candidates)
+   (forward-char)))
 
 ;;;###autoload
 (defun ace-flyspell-dwim ()
@@ -170,9 +170,10 @@
                (consp flyspell-auto-correct-region))
           (not (flyspell-word)))
       (flyspell-auto-correct-word)
-    (ace-flyspell)))
+    (ace-flyspell-correct-word)))
 
-(define-key flyspell-mode-map (kbd "C-.") 'ace-flyspell-dwim)
+(eval-after-load "flyspell"
+  '(define-key flyspell-mode-map (kbd "C-.") 'ace-flyspell-dwim))
 
 (provide 'ace-flyspell)
 ;;; ace-flyspell.el ends here
