@@ -85,7 +85,8 @@
 
 (defface ace-flyspell-background
   '((t (:box t :bold t)))
-  "face for ace-flyspell")
+  "face for ace-flyspell"
+  :group 'ace-flyspell)
 
 (defvar ace-flyspell--ov (let ((ov (make-overlay 1 1 nil nil t)))
                            (overlay-put ov 'face 'ace-flyspell-background)
