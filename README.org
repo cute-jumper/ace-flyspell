@@ -50,7 +50,7 @@ by [[https://github.com/abo-abo/][abo-abo(Oleh Krehel)]]'s [[https://github.com/
 
    This command is bound to =C-.= after you call =M-x ace-flyspell-setup=.
 
-   The following demo shows the usage of =ace-flyspell-dwim=:(Since there is no
+   The following demo shows the usage of =ace-flyspell-dwim= (Since there is no
    misspelt word at the cursor, =ace-flyspell-dwim= actually performs the same
    thing as =ace-flyspell-correct-word= does):
    [[./screencasts/ace-flyspell-dwim.gif]]

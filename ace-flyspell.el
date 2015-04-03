@@ -23,10 +23,12 @@
 
 ;;; Commentary:
 
+;; Demos: See https://github.com/cute-jumper/ace-flyspell
+
 ;; #+TITLE: ace-flyspell
 
 ;; Jump to and correct spelling errors using `ace-jump-mode' and flyspell. Inspired
-;; by [[https://github.com/abo-abo/ace-link][abo-abo(Oleh Krehel)]]'s [[https://github.com/abo-abo/ace-link][ace-link]].
+;; by [[https://github.com/abo-abo/][abo-abo(Oleh Krehel)]]'s [[https://github.com/abo-abo/ace-link][ace-link]].
 
 ;; * Setup
 ;;   : (add-to-list 'load-path "/path/to/ace-flyspell.el")
@@ -34,7 +36,7 @@
 
 ;;   Optional:
 ;;   : M-x ace-flyspell-setup
-  
+
 ;;   If you call =M-x ace-flyspell-setup= , then this setup binds the command
 ;;   =ace-flyspell-dwim= to =C-.=, which is originally bound to
 ;;   =flyspell-auto-correct-word= if you enable the =flyspell-mode=. Of course, you
@@ -122,12 +124,12 @@
                                    :offset (1- x)
                                    :visual-area (car va-list)))
                                 ,candidates))
-                       (setq ace-jump-mode-end-hook
-                             (list (lambda ()
-                                     (setq ace-jump-mode-end-hook)
-                                     ,@follower)))
-                       (let ((ace-jump-mode-scope 'window))
-                         (ace-jump-do ""))))
+     (setq ace-jump-mode-end-hook
+           (list (lambda ()
+                   (setq ace-jump-mode-end-hook)
+                   ,@follower)))
+     (let ((ace-jump-mode-scope 'window))
+       (ace-jump-do ""))))
 ;; End macros from `ace-link.el'
 
 (defun ace-flyspell--collect-candidates ()
@@ -191,27 +193,27 @@
   (interactive)
   (setq ace-flyspell--original-point (point))
   (ace-flyspell--generic
-   (ace-flyspell--collect-candidates)
-   (forward-char)
-   (let* ((word-length (length (save-excursion (car (flyspell-get-word))))))
-     (setq ace-flyspell--original-length word-length)
-     (ace-flyspell--add-overlay (point) (+ (point) word-length)))
-   (setq overriding-local-map
-         (let ((map (make-sparse-keymap)))
-           (define-key map (kbd ".") 'ace-flyspell--auto-correct-word)
-           (define-key map [t] 'ace-flyspell--reset)
-           map))
-   (add-hook 'mouse-leave-buffer-hook 'ace-flyspell--reset)
-   (add-hook 'kbd-macro-termination-hook 'ace-flyspell--reset)
-   (add-hook 'minibuffer-setup-hook 'ace-flyspell--reset)
-   (ace-flyspell-help)))
+      (ace-flyspell--collect-candidates)
+    (forward-char)
+    (let* ((word-length (length (save-excursion (car (flyspell-get-word))))))
+      (setq ace-flyspell--original-length word-length)
+      (ace-flyspell--add-overlay (point) (+ (point) word-length)))
+    (setq overriding-local-map
+          (let ((map (make-sparse-keymap)))
+            (define-key map (kbd ".") 'ace-flyspell--auto-correct-word)
+            (define-key map [t] 'ace-flyspell--reset)
+            map))
+    (add-hook 'mouse-leave-buffer-hook 'ace-flyspell--reset)
+    (add-hook 'kbd-macro-termination-hook 'ace-flyspell--reset)
+    (add-hook 'minibuffer-setup-hook 'ace-flyspell--reset)
+    (ace-flyspell-help)))
 
 ;;;###autoload
 (defun ace-flyspell-jump-word ()
   (interactive)
   (ace-flyspell--generic
-   (ace-flyspell--collect-candidates)
-   (forward-char)))
+      (ace-flyspell--collect-candidates)
+    (forward-char)))
 
 ;;;###autoload
 (defun ace-flyspell-dwim ()
