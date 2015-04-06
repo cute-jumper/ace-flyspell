@@ -85,18 +85,14 @@
   "Jump to and correct spelling errors using `ace-jump-mode' and flyspell"
   :group 'flyspell)
 
-(defface ace-flyspell-background
+(defface ace-flyspell--background
   '((t (:box t :bold t)))
   "face for ace-flyspell"
   :group 'ace-flyspell)
 
 (defvar ace-flyspell--ov (let ((ov (make-overlay 1 1 nil nil t)))
-                           (overlay-put ov 'face 'ace-flyspell-background)
+                           (overlay-put ov 'face 'ace-flyspell--background)
                            ov))
-
-(defvar ace-flyspell--original-point 1)
-
-(defvar ace-flyspell--original-length 0)
 
 ;; Two convenient macros from `ace-link.el', which is a pacakge written by
 ;; Oleh Krehel <ohwoeowho@gmail.com>.
@@ -161,11 +157,8 @@
         (setq ovs (cdr ovs))))
     r))
 
-(defun ace-flyspell--add-overlay (beg end)
-  (move-overlay ace-flyspell--ov beg end (current-buffer)))
-
 (defun ace-flyspell-help ()
-  (message "Press . to do flyspell-auto-correct-word"))
+  (message "Press . to do `flyspell-auto-correct-word'"))
 
 (defun ace-flyspell--auto-correct-word ()
   (interactive)
@@ -178,26 +171,17 @@
   (remove-hook 'mouse-leave-buffer-hook 'ace-flyspell--reset)
   (remove-hook 'kbd-macro-termination-hook 'ace-flyspell--reset)
   (remove-hook 'minibuffer-setup-hook 'ace-flyspell--reset)
-  (let ((ov-start (overlay-start ace-flyspell--ov))
-        (ov-end (overlay-end ace-flyspell--ov)))
-    (if (and ace-flyspell--ov ov-start ov-end)
-        (if (> ov-start ace-flyspell--original-point)
-            (goto-char ace-flyspell--original-point)
-          (goto-char (+ ace-flyspell--original-point (- (- ov-end ov-start)
-                                                        ace-flyspell--original-length))))
-      (goto-char ace-flyspell--original-point)))
+  (goto-char (mark))
   (delete-overlay ace-flyspell--ov))
 
 ;;;###autoload
 (defun ace-flyspell-correct-word ()
   (interactive)
-  (setq ace-flyspell--original-point (point))
   (ace-flyspell--generic
       (ace-flyspell--collect-candidates)
     (forward-char)
     (let* ((word-length (length (save-excursion (car (flyspell-get-word))))))
-      (setq ace-flyspell--original-length word-length)
-      (ace-flyspell--add-overlay (point) (+ (point) word-length)))
+      (move-overlay ace-flyspell--ov (point) (+ (point) word-length)))
     (setq overriding-local-map
           (let ((map (make-sparse-keymap)))
             (define-key map (kbd ".") 'ace-flyspell--auto-correct-word)
