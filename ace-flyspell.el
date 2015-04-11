@@ -90,9 +90,10 @@
   "face for ace-flyspell"
   :group 'ace-flyspell)
 
-(defvar ace-flyspell--ov (let ((ov (make-overlay 1 1 nil nil t)))
-                           (overlay-put ov 'face 'ace-flyspell--background)
-                           ov))
+(defconst ace-flyspell--ov (let ((ov (make-overlay 1 1 nil nil t)))
+                             (overlay-put ov 'face 'ace-flyspell--background)
+                             (delete-overlay ov)
+                             ov))
 
 ;; Two convenient macros from `ace-link.el', which is a pacakge written by
 ;; Oleh Krehel <ohwoeowho@gmail.com>.
