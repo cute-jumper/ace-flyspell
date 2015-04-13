@@ -36,9 +36,10 @@ by [[https://github.com/abo-abo/][abo-abo(Oleh Krehel)]]'s [[https://github.com/
    This command is different from =ace-flyspell-jump-word= in the sense that it
    aims to *correct* rather than *jump to* the spelling error. At first, it
    looks like =ace-flyspell-jump-word=, but after you jump to the misspelt word,
-   it will enter another /mode/, where you hit =.= to invoke
+   it will enter another /mode/, where you hit "." to invoke
    =flyspell-auto-correct-word= to correct the current misspelt word and hit any
-   other key to accept the correction and return to the original position.
+   other key to accept the correction and return to the original position. You
+   can also hit "," to save the current word into personal dictionary.
 
    This command is useful when you're writing an article and want to temporarily
    go back to some spelling error and return to where you left off after fixing

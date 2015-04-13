@@ -57,7 +57,8 @@
 ;;    looks like =ace-flyspell-jump-word=, but after you jump to the misspelt word,
 ;;    it will enter another /mode/, where you hit =.= to invoke
 ;;    =flyspell-auto-correct-word= to correct the current misspelt word and hit any
-;;    other key to accept the correction and return to the original position.
+;;    other key to accept the correction and return to the original position. You
+;;    can also hit "," to save the current word into personal dictionary.
 
 ;;    This command is useful when you're writing an article and want to temporarily
 ;;    go back to some spelling error and return to where you left off after fixing
@@ -163,12 +164,25 @@
     r))
 
 (defun ace-flyspell-help ()
-  (message "Press . to do `flyspell-auto-correct-word'"))
+  (message "[.]: correct word; [,]: save to personal dictionary"))
 
 (defun ace-flyspell--auto-correct-word ()
   (interactive)
   (flyspell-auto-correct-word)
   (ace-flyspell-help))
+
+(defun ace-flyspell--insert-word ()
+  (interactive)
+  (let* ((word-tuple (save-excursion (flyspell-get-word)))
+         (word (car word-tuple))
+         (start (cadr word-tuple)))
+    (ispell-send-string (concat "*" word "\n"))
+    (setq ispell-pdict-modified-p '(t)) ; dictionary modified!
+    (when (fboundp 'flyspell-unhighlight-at)
+      (flyspell-unhighlight-at start))
+    (ispell-pdict-save)
+    (sit-for 1)
+    (ace-flyspell-help)))
 
 (defun ace-flyspell--reset ()
   (interactive)
@@ -190,6 +204,7 @@
     (setq overriding-local-map
           (let ((map (make-sparse-keymap)))
             (define-key map (kbd ".") 'ace-flyspell--auto-correct-word)
+            (define-key map (kbd ",") 'ace-flyspell--insert-word)
             (define-key map [t] 'ace-flyspell--reset)
             map))
     (add-hook 'mouse-leave-buffer-hook 'ace-flyspell--reset)
