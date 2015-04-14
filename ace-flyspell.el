@@ -96,10 +96,21 @@
                              (delete-overlay ov)
                              ov))
 
+(defvar ace-flyspell--original-end-hook ace-jump-mode-end-hook
+  "Save the original `ace-jump-mode-end-hook' to cooperate with
+  other packages which set this hook")
+
+(defun ace-flyspell--restore-end-hook ()
+  "Restore the original `ace-jump-mode-end-hook'."
+  (setq ace-jump-mode-end-hook ace-flyspell--original-end-hook)
+  (remove-hook 'mouse-leave-buffer-hook 'ace-flyspell--restore-end-hook)
+  (remove-hook 'kbd-macro-termination-hook 'ace-flyspell--restore-end-hook))
+
 ;; Two convenient macros from `ace-link.el', which is a pacakge written by
 ;; Oleh Krehel <ohwoeowho@gmail.com>.
 ;; Original code URL: https://github.com/abo-abo/ace-link
 ;; I modified the macro name to conform the naming convention
+;; Update: 04/14/2015 - Fix end hook problems.
 (defmacro ace-flyspell--flet (binding &rest body)
   "Temporarily override BINDING and execute BODY."
   (declare (indent 1))
@@ -115,23 +126,27 @@
 (defmacro ace-flyspell--generic (candidates &rest follower)
   "Ace jump to CANDIDATES using FOLLOWER."
   (declare (indent 1))
-  `(ace-flyspell--flet (ace-jump-search-candidate
-                        (str va-list)
-                        (mapcar (lambda (x)
-                                  (make-aj-position
-                                   :offset (1- x)
-                                   :visual-area (car va-list)))
-                                ,candidates))
-     (setq ace-jump-mode-end-hook
-           (list (lambda ()
-                   (setq ace-jump-mode-end-hook)
-                   ,@follower)))
-     (condition-case err
-         (let ((ace-jump-mode-scope 'window))
-           (ace-jump-do ""))
-       (error
-        (setq ace-jump-mode-end-hook)
-        (signal (car err) (cdr err))))))
+  `(progn
+     (add-hook 'mouse-leave-buffer-hook 'ace-flyspell--restore-end-hook)
+     (add-hook 'kbd-macro-termination-hook 'ace-flyspell--restore-end-hook)
+     (ace-flyspell--flet (ace-jump-search-candidate
+                          (str va-list)
+                          (mapcar (lambda (x)
+                                    (make-aj-position
+                                     :offset (1- x)
+                                     :visual-area (car va-list)))
+                                  ,candidates))
+       (setq ace-jump-mode-end-hook
+             (list
+              (lambda ()
+                (ace-flyspell--restore-end-hook)
+                ,@follower)))
+       (condition-case err
+           (let ((ace-jump-mode-scope 'window))
+             (ace-jump-do ""))
+         (error
+          (ace-flyspell--restore-end-hook)
+          (signal (car err) (cdr err)))))))
 ;; End macros from `ace-link.el'
 
 (defun ace-flyspell--collect-candidates ()
