@@ -196,8 +196,7 @@
     (when (fboundp 'flyspell-unhighlight-at)
       (flyspell-unhighlight-at start))
     (ispell-pdict-save)
-    (sit-for 1)
-    (ace-flyspell-help)))
+    (ace-flyspell--reset)))
 
 (defun ace-flyspell--reset ()
   (interactive)
