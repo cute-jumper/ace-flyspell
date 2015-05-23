@@ -1,5 +1,6 @@
 #+TITLE: ace-flyspell
 [[http://melpa.org/#/ace-flyspell][file:http://melpa.org/packages/ace-flyspell-badge.svg]]
+[[http://stable.melpa.org/#/ace-flyspell][file:http://stable.melpa.org/packages/ace-flyspell-badge.svg]]
 
 Jump to and correct spelling errors using `ace-jump-mode' and flyspell. Inspired
 by [[https://github.com/abo-abo/][abo-abo(Oleh Krehel)]]'s [[https://github.com/abo-abo/ace-link][ace-link]].
@@ -10,7 +11,7 @@ by [[https://github.com/abo-abo/][abo-abo(Oleh Krehel)]]'s [[https://github.com/
 
   Optional:
   : M-x ace-flyspell-setup
-  
+
   If you call =M-x ace-flyspell-setup= , then this setup binds the command
   =ace-flyspell-dwim= to =C-.=, which is originally bound to
   =flyspell-auto-correct-word= if you enable the =flyspell-mode=. Of course, you
@@ -57,8 +58,8 @@ by [[https://github.com/abo-abo/][abo-abo(Oleh Krehel)]]'s [[https://github.com/
    [[./screencasts/ace-flyspell-dwim.gif]]
 
 * Acknowledgment
-  This package is based on [[https://github.com/winterTTr/ace-jump-mode][winterTTr]]'s awesome [[https://github.com/winterTTr/ace-jump-mode][ace-jump-mode]] package and
-  inspired by [[https://github.com/abo-abo/ace-link][abo-abo(Oleh Krehel)]]'s [[https://github.com/abo-abo/ace-link][ace-link]] package, from which I borrowed two
+  This package is based on [[https://github.com/winterTTr/][winterTTr]]'s awesome [[https://github.com/winterTTr/ace-jump-mode][ace-jump-mode]] package and
+  inspired by [[https://github.com/abo-abo/][abo-abo(Oleh Krehel)]]'s [[https://github.com/abo-abo/ace-link][ace-link]] package, from which I borrowed two
   convenient macros, and this package is kind of like the a variant of the
   original [[https://github.com/abo-abo/ace-link][ace-link]] package although I made some further extensions to meet my
   own needs.
