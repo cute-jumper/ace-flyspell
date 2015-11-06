@@ -13,7 +13,7 @@ by [[https://github.com/abo-abo/][abo-abo(Oleh Krehel)]]'s [[https://github.com/
   : M-x ace-flyspell-setup
 
   If you call =M-x ace-flyspell-setup= , then this setup binds the command
-  =ace-flyspell-dwim= to =C-.=, which is originally bound to
+  =ace-flyspell-dwim= to @@html:<kbd>@@C-.@@html:</kbd>@@, which is originally bound to
   =flyspell-auto-correct-word= if you enable the =flyspell-mode=. Of course, you
   can choose to change the key binding.
 
@@ -31,16 +31,16 @@ by [[https://github.com/abo-abo/][abo-abo(Oleh Krehel)]]'s [[https://github.com/
    [[./screencasts/ace-flyspell-jump-word.gif]]
 
    If you prefer this command to the following =ace-flyspell-dwim= (which will
-   be bound to =C-.= if you call =M-x ace-flyspell-setup=), you should probably
+   be bound to @@html:<kbd>@@C-.@@html:</kbd>@@ if you call =M-x ace-flyspell-setup=), you should probably
    give it a key binding.
 ** =ace-flyspell-correct-word=
    This command is different from =ace-flyspell-jump-word= in the sense that it
    aims to *correct* rather than *jump to* the spelling error. At first, it
    looks like =ace-flyspell-jump-word=, but after you jump to the misspelt word,
-   it will enter another /mode/, where you hit "." to invoke
+   it will enter another /mode/, where you hit @@html:<kbd>@@.@@html:</kbd>@@ to invoke
    =flyspell-auto-correct-word= to correct the current misspelt word and hit any
    other key to accept the correction and return to the original position. You
-   can also hit "," to save the current word into personal dictionary.
+   can also hit @@html:<kbd>@@,@@html:</kbd>@@ to save the current word into personal dictionary.
 
    This command is useful when you're writing an article and want to temporarily
    go back to some spelling error and return to where you left off after fixing
@@ -50,7 +50,7 @@ by [[https://github.com/abo-abo/][abo-abo(Oleh Krehel)]]'s [[https://github.com/
    =flyspell-auto-correct-word=, otherwise it will call
    =ace-flyspell-correct-word= to jump to and correct some spelling error.
 
-   This command is bound to =C-.= after you call =M-x ace-flyspell-setup=.
+   This command is bound to @@html:<kbd>@@C-.@@html:</kbd>@@ after you call =M-x ace-flyspell-setup=.
 
    The following demo shows the usage of =ace-flyspell-dwim= (Since there is no
    misspelt word at the cursor, =ace-flyspell-dwim= actually performs the same
