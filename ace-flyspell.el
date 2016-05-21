@@ -251,13 +251,13 @@ hook")
         (setq ovs (cdr ovs))))
     r))
 
-(defun ace-flyspell-help ()
+(defun ace-flyspell-help-default ()
   (message "[.]: correct word; [,]: save to personal dictionary"))
 
 (defun ace-flyspell--auto-correct-word ()
   (interactive)
   (flyspell-auto-correct-word)
-  (ace-flyspell-help))
+  (ace-flyspell-help-default))
 
 (defun ace-flyspell--insert-word ()
   (interactive)
@@ -273,31 +273,43 @@ hook")
 
 (defun ace-flyspell--reset ()
   (interactive)
-  (setq overriding-local-map nil)
-  (remove-hook 'mouse-leave-buffer-hook 'ace-flyspell--reset)
-  (remove-hook 'kbd-macro-termination-hook 'ace-flyspell--reset)
-  (remove-hook 'minibuffer-setup-hook 'ace-flyspell--reset)
+  (message "")
   (goto-char (mark))
   (delete-overlay ace-flyspell--ov))
 
-;;;###autoload
-(defun ace-flyspell-correct-word ()
+(define-key qjp-mode-map (kbd "C-'") 'ace-flyspell-avy-correct-word)
+
+(defvar ace-flyspell-handler nil)
+(defvar ace-flyspell--current-word nil)
+
+(defun ace-flyspell-avy-correct-word ()
   (interactive)
-  (ace-flyspell--generic
-      (ace-flyspell--collect-candidates)
-    (forward-char)
-    (let* ((word-length (length (save-excursion (car (flyspell-get-word))))))
-      (move-overlay ace-flyspell--ov (point) (+ (point) word-length)))
-    (setq overriding-local-map
-          (let ((map (make-sparse-keymap)))
-            (define-key map (kbd ".") 'ace-flyspell--auto-correct-word)
-            (define-key map (kbd ",") 'ace-flyspell--insert-word)
-            (define-key map [t] 'ace-flyspell--reset)
-            map))
-    (add-hook 'mouse-leave-buffer-hook 'ace-flyspell--reset)
-    (add-hook 'kbd-macro-termination-hook 'ace-flyspell--reset)
-    (add-hook 'minibuffer-setup-hook 'ace-flyspell--reset)
-    (ace-flyspell-help)))
+  (let (avy-action
+        avy-all-windows)
+    (avy--process (ace-flyspell--collect-candidates)
+                  (avy--style-fn avy-style))
+    (let ((word-tuple (save-excursion (flyspell-get-word))))
+      (setq ace-flyspell--current-word (car word-tuple))
+      (move-overlay ace-flyspell--ov (nth 1 word-tuple) (nth 2 word-tuple)))
+    (unwind-protect
+        (if (functionp ace-flyspell-handler)
+            (funcall ace-flyspell-handler)
+          (ace-flyspell-default-handler))
+      (ace-flyspell--reset))))
+
+(defun ace-flyspell-default-handler ()
+  (let (char (flag t))
+    (ace-flyspell-help-default)
+    (while (and flag (setq char (read-key)))
+      (ace-flyspell-help-default)
+      (cond
+       ((char-equal char ?.) (ace-flyspell--auto-correct-word))
+       ((char-equal char ?,) (ace-flyspell--insert-word))
+       ((char-equal char ?\C-g) (delete-region (overlay-start ace-flyspell--ov)
+                                               (overlay-end ace-flyspell--ov))
+        (insert ace-flyspell--current-word)
+        (setq flag nil))
+       (t (setq flag nil))))))
 
 ;;;###autoload
 (defun ace-flyspell-jump-word ()
