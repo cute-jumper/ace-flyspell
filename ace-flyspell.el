@@ -5,7 +5,7 @@
 ;; Author: Junpeng Qiu <qjpchmail@gmail.com>
 ;; URL: https://github.com/cute-jumper/ace-flyspell
 ;; Version: 0.1.2
-;; Package-Requires: ((ace-jump-mode "2.0"))
+;; Package-Requires: ((avy "0.4.0"))
 ;; Keywords: extensions
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -151,11 +151,11 @@
 
 ;;; Code:
 
-(require 'ace-jump-mode)
+(require 'avy)
 (require 'flyspell)
 
 (defgroup ace-flyspell nil
-  "Jump to and correct spelling errors using `ace-jump-mode' and flyspell"
+  "Jump to and correct spelling errors using `avy' and flyspell"
   :group 'flyspell)
 
 (defface ace-flyspell--background
@@ -163,64 +163,13 @@
   "face for ace-flyspell"
   :group 'ace-flyspell)
 
+(defvar ace-flyspell-handler nil)
+(defvar ace-flyspell--current-word nil)
+
 (defconst ace-flyspell--ov (let ((ov (make-overlay 1 1 nil nil t)))
                              (overlay-put ov 'face 'ace-flyspell--background)
                              (delete-overlay ov)
                              ov))
-
-(defvar ace-flyspell--original-end-hook ace-jump-mode-end-hook
-  "Save the original `ace-jump-mode-end-hook'.
-This is used to cooperate with other packages which set this
-hook")
-
-(defun ace-flyspell--restore-end-hook ()
-  "Restore the original `ace-jump-mode-end-hook'."
-  (setq ace-jump-mode-end-hook ace-flyspell--original-end-hook)
-  (remove-hook 'mouse-leave-buffer-hook 'ace-flyspell--restore-end-hook)
-  (remove-hook 'kbd-macro-termination-hook 'ace-flyspell--restore-end-hook))
-
-;; Two convenient macros from `ace-link.el', which is a pacakge written by
-;; Oleh Krehel <ohwoeowho@gmail.com>.
-;; Original code URL: https://github.com/abo-abo/ace-link
-;; I modified the macro name to conform the naming convention
-;; Update: 04/14/2015 - Fix end hook problems.
-(defmacro ace-flyspell--flet (binding &rest body)
-  "Temporarily override BINDING and execute BODY."
-  (declare (indent 1))
-  (let* ((name (car binding))
-         (old (cl-gensym (symbol-name name))))
-    `(let ((,old (symbol-function ',name)))
-       (unwind-protect
-           (progn
-             (fset ',name (lambda ,@(cdr binding)))
-             ,@body)
-         (fset ',name ,old)))))
-
-(defmacro ace-flyspell--generic (candidates &rest follower)
-  "Ace jump to CANDIDATES using FOLLOWER."
-  (declare (indent 1))
-  `(progn
-     (add-hook 'mouse-leave-buffer-hook 'ace-flyspell--restore-end-hook)
-     (add-hook 'kbd-macro-termination-hook 'ace-flyspell--restore-end-hook)
-     (ace-flyspell--flet (ace-jump-search-candidate
-                          (str va-list)
-                          (mapcar (lambda (x)
-                                    (make-aj-position
-                                     :offset (1- x)
-                                     :visual-area (car va-list)))
-                                  ,candidates))
-       (setq ace-jump-mode-end-hook
-             (list
-              (lambda ()
-                (ace-flyspell--restore-end-hook)
-                ,@follower)))
-       (condition-case err
-           (let ((ace-jump-mode-scope 'window))
-             (ace-jump-do ""))
-         (error
-          (ace-flyspell--restore-end-hook)
-          (signal (car err) (cdr err)))))))
-;; End macros from `ace-link.el'
 
 (defun ace-flyspell--collect-candidates ()
   (save-excursion
@@ -255,7 +204,6 @@ hook")
   (message "[.]: correct word; [,]: save to personal dictionary"))
 
 (defun ace-flyspell--auto-correct-word ()
-  (interactive)
   (flyspell-auto-correct-word)
   (ace-flyspell-help-default))
 
@@ -274,20 +222,16 @@ hook")
 (defun ace-flyspell--reset ()
   (interactive)
   (message "")
-  (goto-char (mark))
   (delete-overlay ace-flyspell--ov))
 
-(define-key qjp-mode-map (kbd "C-'") 'ace-flyspell-avy-correct-word)
-
-(defvar ace-flyspell-handler nil)
-(defvar ace-flyspell--current-word nil)
-
-(defun ace-flyspell-avy-correct-word ()
-  (interactive)
-  (let (avy-action
-        avy-all-windows)
+(defun ace-flyspell--avy-word ()
+  (let (avy-action avy-all-windows)
     (avy--process (ace-flyspell--collect-candidates)
-                  (avy--style-fn avy-style))
+                  (avy--style-fn avy-style))))
+
+(defun ace-flyspell-correct-word ()
+  (interactive)
+  (when (numberp (ace-flyspell--avy-word))
     (let ((word-tuple (save-excursion (flyspell-get-word))))
       (setq ace-flyspell--current-word (car word-tuple))
       (move-overlay ace-flyspell--ov (nth 1 word-tuple) (nth 2 word-tuple)))
@@ -295,7 +239,8 @@ hook")
         (if (functionp ace-flyspell-handler)
             (funcall ace-flyspell-handler)
           (ace-flyspell-default-handler))
-      (ace-flyspell--reset))))
+      (ace-flyspell--reset)
+      (goto-char (mark)))))
 
 (defun ace-flyspell-default-handler ()
   (let (char (flag t))
@@ -314,9 +259,7 @@ hook")
 ;;;###autoload
 (defun ace-flyspell-jump-word ()
   (interactive)
-  (ace-flyspell--generic
-      (ace-flyspell--collect-candidates)
-    (forward-char)))
+  (ace-flyspell--avy-word))
 
 ;;;###autoload
 (defun ace-flyspell-dwim ()
