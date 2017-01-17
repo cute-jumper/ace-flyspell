@@ -217,7 +217,8 @@
     (when (fboundp 'flyspell-unhighlight-at)
       (flyspell-unhighlight-at start))
     (ispell-pdict-save)
-    (ace-flyspell--reset)))
+    (ace-flyspell--reset)
+    (goto-char (mark))))
 
 (defun ace-flyspell--reset ()
   (interactive)
