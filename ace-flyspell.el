@@ -66,7 +66,7 @@
 ;; =======
 
 ;;   ,----
-;;   | (add-to-list 'load-path "")
+;;   | (add-to-list 'load-path "/path/to/ace-flyspell")
 ;;   | (require 'ace-flyspell)
 ;;   `----
 

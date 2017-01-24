@@ -8,7 +8,7 @@ Jump to and correct spelling errors using =avy= and flyspell. Inspired by
 [[https://github.com/abo-abo/][abo-abo(Oleh Krehel)]]'s [[https://github.com/abo-abo/ace-link][ace-link]].
 
 * Setup
-  : (add-to-list 'load-path "")
+  : (add-to-list 'load-path "/path/to/ace-flyspell")
   : (require 'ace-flyspell)
 
   Optional:
