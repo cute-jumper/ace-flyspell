@@ -2,11 +2,13 @@
 [[http://melpa.org/#/ace-flyspell][file:http://melpa.org/packages/ace-flyspell-badge.svg]]
 [[http://stable.melpa.org/#/ace-flyspell][file:http://stable.melpa.org/packages/ace-flyspell-badge.svg]]
 
-Jump to and correct spelling errors using `ace-jump-mode' and flyspell. Inspired
-by [[https://github.com/abo-abo/][abo-abo(Oleh Krehel)]]'s [[https://github.com/abo-abo/ace-link][ace-link]].
+*UPDATE 2017-01-24*: Now use =avy= instead of =ace-jump-mode=.
+
+Jump to and correct spelling errors using =avy= and flyspell. Inspired by
+[[https://github.com/abo-abo/][abo-abo(Oleh Krehel)]]'s [[https://github.com/abo-abo/ace-link][ace-link]].
 
 * Setup
-  : (add-to-list 'load-path "/path/to/ace-flyspell.el")
+  : (add-to-list 'load-path "")
   : (require 'ace-flyspell)
 
   Optional:
@@ -24,8 +26,8 @@ by [[https://github.com/abo-abo/][abo-abo(Oleh Krehel)]]'s [[https://github.com/
 * Usage
   There are three available commands:
 ** =ace-flyspell-jump-word=
-   This command jumps to an spelling error using =ace-jump-word-mode=, and move
-   the point to where the spelling error is.
+   This command jumps to an spelling error using =avy=, and move the point to
+   where the spelling error is.
 
    The following demo shows the usage of =ace-flyspell-jump-word=:
    [[./screencasts/ace-flyspell-jump-word.gif]]
@@ -58,8 +60,5 @@ by [[https://github.com/abo-abo/][abo-abo(Oleh Krehel)]]'s [[https://github.com/
    [[./screencasts/ace-flyspell-dwim.gif]]
 
 * Acknowledgment
-  This package is based on [[https://github.com/winterTTr/][winterTTr]]'s awesome [[https://github.com/winterTTr/ace-jump-mode][ace-jump-mode]] package and
-  inspired by [[https://github.com/abo-abo/][abo-abo(Oleh Krehel)]]'s [[https://github.com/abo-abo/ace-link][ace-link]] package, from which I borrowed two
-  convenient macros, and this package is kind of like the a variant of the
-  original [[https://github.com/abo-abo/ace-link][ace-link]] package although I made some further extensions to meet my
-  own needs.
+  - [[https://github.com/abo-abo/avy][avy]]
+  - [[https://github.com/abo-abo/ace-link][ace-link]]
