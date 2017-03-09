@@ -163,6 +163,9 @@
   "face for ace-flyspell"
   :group 'ace-flyspell)
 
+(defvar ace-flyspell-new-word-no-query nil
+  "If t, don't ask for confirmation when adding new words.")
+
 (defvar ace-flyspell-handler nil)
 (defvar ace-flyspell--current-word nil)
 
@@ -216,7 +219,7 @@
     (setq ispell-pdict-modified-p '(t)) ; dictionary modified!
     (when (fboundp 'flyspell-unhighlight-at)
       (flyspell-unhighlight-at start))
-    (ispell-pdict-save)
+    (ispell-pdict-save ace-flyspell-new-word-no-query)
     (ace-flyspell--reset)
     (goto-char (mark))))
 
